@@ -1,31 +1,33 @@
 #!/bin/sh
 #[config]------------------------------------------------------------------------
 MAC_BROWSER=/Applications/Safari.app
+#MAC_BROWSER=/usr/local/bin/w3m
 LINUX_BROWSER=x-www-browser
 UTF8MANPATH="/usr/local/share/man/ja_JP.UTF-8"
 
 #[functions]------------------------------------------------------------------------
 args_not_found() {
+    echo "usage: cli_searcher [options] keyword"
     echo "options:"
-    echo "  -n|--net <command>     : JP Project manpage."
-    echo "  --php <function>       : http://jp2.php.net/%s"
-    echo "  --alc <word>           : http://eow.alc.co.jp/search?q=%s"
-    echo "  --archwiki <word>      : https://wiki.archlinux.org/index.php/%s"
-    echo "  --stackoverflow <word> : http://stackoverflow.com/questions/tagged/%s"
-    echo "  --qiita-tag <tagname>  : http://qiita.com/tags/%s"
-    echo "  --qiita <word>         : http://qiita.com/search?q=%s"
-    echo "  --googlemap <word>     : https://maps.google.co.jp/maps?saddr=%s"
-    echo "  --google <word>        : http://www.google.co.jp/search?q=%s"
-    echo "  --smblookup <pc_name>  : smbutil lookup <pc_name>"
-    echo "  --jobtalk <company>    : http://jobtalk.jp/company/keyword_%s_1.html"
-    echo "  --kakaku <word>        : http://kakaku.com/search_results/%s"
-    echo "  --wikipedia <word>     : http://ja.wikipedia.org/wiki/%s"
-    echo "  --weather <word>       : http://search.weather.yahoo.co.jp/bin/search?p=%s"
-    echo "  --youtube <word>       : http://www.youtube.com/results?search_query=%s"
-    echo "  --github-python <word> : https://github.com/search?type=Code&l=python&q=%s"
-    echo "  --github-php <word>    : https://github.com/search?type=Code&l=php&q=%s"
-    echo "  --github-html <word>   : https://github.com/search?type=Code&l=html&q=%s"
-    echo "  --github-javascript <word> : https://github.com/search?type=Code&l=javascript&q=%s"
+    echo "  -n|--net             : man日本語ウェブ"
+    echo "  --php                : phpマニュアル"
+    echo "  --alc                : alc和英/和英"
+    echo "  --archwiki           : archwiki"
+    echo "  --stackoverflow      : stackoverflow"
+    echo "  --qiita-tag          : qiitaタグ"
+    echo "  --qiita              : qiita"
+    echo "  --googlemap          : googleマップ"
+    echo "  --google             : google"
+    echo "  --smblookup          : Windowsのコンピュータ名検索"
+    echo "  --jobtalk            : 企業の内情"
+    echo "  --kakaku             : 価格コム"
+    echo "  --wikipedia          : wikipedia"
+    echo "  --weather            : 天気"
+    echo "  --youtube            : youtube"
+    echo "  --github-python      : github code search"
+    echo "  --github-php         : github code search"
+    echo "  --github-html        : github code search"
+    echo "  --github-javascript  : github code search"
     man
 }
 
@@ -70,7 +72,11 @@ set_url() {
 
 browse() {
     if [ "`uname -s`" = "Darwin" ];then
-        open ${MAC_BROWSER} ${1}
+        if [ "${MAC_BROWSER: -4}" = ".app" ];then
+            open ${MAC_BROWSER} ${1}
+        else
+            ${MAC_BROWSER} ${1}
+        fi
     else
         ${LINUX_BROWSER} ${1}
     fi
