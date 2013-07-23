@@ -1,6 +1,7 @@
 usage
 ====
 
+```Bash:
 options:
   -n|--net <command>     : JP Project manpage.
   --php <function>       : http://jp2.php.net/<function>
@@ -11,4 +12,6 @@ options:
   --qiita <word>         : http://qiita.com/search?q=<word>
   --googlemap <word>     : https://maps.google.co.jp/maps?saddr=<word>
   --google <word>        : http://www.google.co.jp/search?q=<word>
+  --smblookup <pc_name>  : smbutil lookup <pc_name>
 What manual page do you want?
+```

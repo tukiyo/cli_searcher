@@ -16,6 +16,7 @@ args_not_found() {
     echo "  --qiita <word>         : http://qiita.com/search?q=<word>"
     echo "  --googlemap <word>     : https://maps.google.co.jp/maps?saddr=<word>"
     echo "  --google <word>        : http://www.google.co.jp/search?q=<word>"
+    echo "  --smblookup <pc_name>  : smbutil lookup <pc_name>"
     man
 }
 
@@ -51,7 +52,6 @@ set_url() {
 }
 
 browse() {
-    #QUERY=`sed s// $@`
     if [ "`uname -s`" = "Darwin" ];then
         open ${MAC_BROWSER} ${1}
     else
@@ -80,6 +80,10 @@ case "$1" in
     --googlemap|\
     --google)
     ;;
+    --smblookup)
+    smbutil lookup $2
+    exit 0
+    ;;
     *)
     colorman $@
     ;;
@@ -89,13 +93,15 @@ esac
 set_url $1 $2
 
 ## join search words
-args=("$@")
-for i in `seq 2 $#`
+for query in "$@"
 do
+    echo $query 
+    if [ "$query" = "$0" ];then continue;fi
+    if [ "$query" = "$1" ];then continue;fi
     if [ "$SEARCHWORD" = "" ];then
-        SEARCHWORD=${args[$i-1]}
+        SEARCHWORD=$query
     else
-        SEARCHWORD=${SEARCHWORD}+${args[$i-1]}
+        SEARCHWORD=${SEARCHWORD}+$query
     fi
 done
 
