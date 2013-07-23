@@ -1,0 +1,104 @@
+#!/bin/sh
+#[config]------------------------------------------------------------------------
+MAC_BROWSER=/Applications/Safari.app
+LINUX_BROWSER=x-www-browser
+UTF8MANPATH="/usr/local/share/man/ja_JP.UTF-8"
+
+#[functions]------------------------------------------------------------------------
+args_not_found() {
+    echo "options:"
+    echo "  -n|--net <command>     : JP Project manpage."
+    echo "  --php <function>       : http://jp2.php.net/<function>"
+    echo "  --alc <word>           : http://eow.alc.co.jp/search?q=<word>"
+    echo "  --archwiki <word>      : https://wiki.archlinux.org/index.php/<word>"
+    echo "  --stackoverflow <word> : http://stackoverflow.com/questions/tagged/<word>"
+    echo "  --qiita-tag <tagname>  : http://qiita.com/tags/<tagname>"
+    echo "  --qiita <word>         : http://qiita.com/search?q=<word>"
+    echo "  --googlemap <word>     : https://maps.google.co.jp/maps?saddr=<word>"
+    echo "  --google <word>        : http://www.google.co.jp/search?q=<word>"
+    man
+}
+
+colorman() {
+    env LESS_TERMCAP_mb=$(printf "\e[1;31m") \
+        LESS_TERMCAP_md=$(printf "\e[1;31m") \
+        LESS_TERMCAP_me=$(printf "\e[0m") \
+        LESS_TERMCAP_se=$(printf "\e[0m") \
+        LESS_TERMCAP_so=$(printf "\e[1;44;33m") \
+        LESS_TERMCAP_ue=$(printf "\e[0m") \
+        LESS_TERMCAP_us=$(printf "\e[1;32m") \
+        man "$@"
+    exit 0
+}
+
+set_url() {
+    URL="http://linuxjm.sourceforge.jp/cgi-bin/man.cgi?Pagename="
+    case "$1" in
+        "--php") URL="http://jp2.php.net/" ;;
+        "--alc") URL="http://eow.alc.co.jp/search?q=" ;;
+        "--archwiki") URL="https://wiki.archlinux.org/index.php/" ;;
+        "--stackoverflow") URL="http://stackoverflow.com/questions/tagged/" ;;
+        "--qiita") URL="http://qiita.com/search?q=" ;;
+        "--qiita-tag") URL="http://qiita.com/tags/" ;;
+        "--googlemap") URL="https://maps.google.co.jp/maps?saddr=" ;;
+        "--google") URL="http://www.google.co.jp/search?q=" ;;
+    esac
+    case "$2" in
+        ssh|ssh_config|sshd|sshd_config|ssh-agent|ssh-add|scp|sftp|ssh-keygen|sftp-server|ssh-keyscan|ssh-keysign)
+        URL="http://www.unixuser.org/~euske/doc/openssh/jman/"
+        ;;
+    esac
+}
+
+browse() {
+    #QUERY=`sed s// $@`
+    if [ "`uname -s`" = "Darwin" ];then
+        open ${MAC_BROWSER} ${1}
+    else
+        ${LINUX_BROWSER} ${1}
+    fi
+}
+
+#[main]---------------------------------------------------------------------------
+if [ "$1" = "" ];then
+    args_not_found
+    exit 0
+fi
+
+if [ -d "$UTF8MANPATH" ];then
+    export MANPATH=${UTF8MANPATH}:${MANPATH}
+fi
+
+## colorman
+case "$1" in
+    -n|--net|\
+    --php|\
+    --alc|\
+    --archwiki|\
+    --stackoverflow|\
+    --qiita|--qiita-tag|\
+    --googlemap|\
+    --google)
+    ;;
+    *)
+    colorman $@
+    ;;
+esac
+
+## set_url
+set_url $1 $2
+
+## join search words
+args=("$@")
+for i in `seq 2 $#`
+do
+    if [ "$SEARCHWORD" = "" ];then
+        SEARCHWORD=${args[$i-1]}
+    else
+        SEARCHWORD=${SEARCHWORD}+${args[$i-1]}
+    fi
+done
+
+## browse
+echo [browse] ${URL}${SEARCHWORD}
+browse ${URL}${SEARCHWORD}
