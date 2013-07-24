@@ -22,6 +22,7 @@ args_not_found() {
     echo "  --jobtalk            : 企業の内情"
     echo "  --kakaku             : 価格コム"
     echo "  --wikipedia          : wikipedia"
+    echo "  --vimdoc             : vimdoc"
     echo "  --weather            : 天気"
     echo "  --youtube            : youtube"
     echo "  --github-python      : github code search"
@@ -58,6 +59,7 @@ set_url() {
         --kakaku) URL="http://kakaku.com/search_results/%s" ;;
         --wikipedia) URL="http://ja.wikipedia.org/wiki/%s" ;;
         --weather) URL="http://search.weather.yahoo.co.jp/bin/search?p=%s" ;;
+        --vimdoc) URL="http://vimdoc.sourceforge.net/search.php?docs=help&search=%s" ;;
         --youtube) URL="http://www.youtube.com/results?search_query=%s" ;;
         --github-python) URL="https://github.com/search?type=Code&l=python&q=%s" ;;
         --github-php) URL="https://github.com/search?type=Code&l=php&q=%s" ;;
@@ -105,6 +107,7 @@ case "$1" in
     --jobtalk|\
     --kakaku|\
     --wikipedia|\
+    --vimdoc|\
     --weather|\
     --youtube|\
     --github-python|--github-php|--github-html|--github-javascript)
@@ -135,5 +138,11 @@ done
 
 ## browse
 URL=`printf ${URL} ${SEARCHWORD}`
+
+if [ $1 = "-n" -o $1 = "--net" ];then
+    NOTFOUND=`curl -s -I $URL | grep Location | grep nosuchpage`
+    if [ "$NOTFOUND" != "" ]; then echo "[quit] page not found."; exit 0; fi
+fi
 echo [browse] $URL
+
 browse $URL
