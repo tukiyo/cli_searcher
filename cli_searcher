@@ -139,11 +139,11 @@ do
     if [ "$SEARCHWORD" = "" ];then
         SEARCHWORD=$query
     else
-        SEARCHWORD=${SEARCHWORD}+$query
+        SEARCHWORD="${SEARCHWORD} $query"
     fi
 done
 
-url_encode $SEARCHWORD
+url_encode "$SEARCHWORD"
 
 ## browse
 URL=$(printf ${URL} ${URL_ENCODED})
