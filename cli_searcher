@@ -46,7 +46,7 @@ colorman() {
 }
 
 set_url() {
-    URL="http://linuxjm.sourceforge.jp/cgi-bin/man.cgi?Pagename=%s"
+    URL="http://linuxjm.sourceforge.jp/cgi-bin/man.cgi?Pagename=%s&Sec1=on&Sec2=on&Sec3=on&Sec4=on&Sec5=on&Sec6=on&Sec7=on&Sec8=on"
     case "$1" in
         --php) URL="http://jp2.php.net/%s" ;;
         --alc) URL="http://eow.alc.co.jp/search?q=%s" ;;
@@ -149,8 +149,12 @@ url_encode "$SEARCHWORD"
 URL=$(printf ${URL} ${URL_ENCODED})
 
 if [ $1 = "-n" -o $1 = "--net" ];then
-    NOTFOUND=$(curl -s -I $URL | grep Location | grep nosuchpage)
-    if [ "$NOTFOUND" != "" ]; then echo "[quit] page not found."; exit 0; fi
+    URL=$(curl -s -I $URL | grep "Location:" | cut -d " " -f 2)
+    # URLに %0D がくっ付くので改行コード削除
+    URL=$(echo $URL | tr -d '\r')
+    URL=$(echo $URL | tr -d '\n')
+    echo $URL | grep nosuchpage
+    if [ $? == 0 ]; then echo "[quit] page not found."; exit 0; fi
 fi
 echo [browse] $URL
 
