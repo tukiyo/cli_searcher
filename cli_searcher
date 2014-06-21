@@ -93,6 +93,7 @@ url_encode() {
 }
 
 whois_jp_contact() {
+    whois $(dig +short $1) | grep inetnum | tail -n 1
     WHOIS=$(whois -h whois2013.jprs.jp $1 | awk -F "]" '/登録者名|組織名/{$1="";print}')
     url_encode "$(echo $WHOIS | nkf -s)"
     WHOIS=${URL_ENCODED}
