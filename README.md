@@ -15,6 +15,7 @@ options:
   --gmail              : gmail
   --google             : google
   --smblookup          : Windowsのコンピュータ名検索
+  --whois-jp-contact   : jpドメイン名から登録者一覧を検索
   --jobtalk            : 企業の内情
   --kakaku             : 価格コム
   --wikipedia          : wikipedia
