@@ -29,6 +29,8 @@ args_not_found() {
     echo "  --vimdoc             : vimdoc"
     echo "  --weather            : 天気"
     echo "  --youtube            : youtube"
+    echo "  --check_openresolver : DNSサーバがオープンリゾルバ状態か確認"
+    echo "  --check_globalip     : Global IPを確認"
     echo "  --github-python      : github code search"
     echo "  --github-php         : github code search"
     echo "  --github-html        : github code search"
@@ -91,6 +93,18 @@ browse() {
 
 url_encode() {
     URL_ENCODED=$(python -c "import sys, urllib; print urllib.quote_plus(sys.argv[1])" "$1")
+}
+
+check_openresolver() {
+    COMMAND="wget -qO - http://www.openresolver.jp/cli/check.html"
+    echo "$ $COMMAND"
+    $COMMAND
+}
+
+check_globalip() {
+    COMMAND="curl http://ifconfig.me/"
+    echo "$ $COMMAND"
+    $COMMAND
 }
 
 whois_jp_contact() {
@@ -191,6 +205,14 @@ case "$1" in
     ;;
     --whois_jp_contact2)
     whois_jp_contact $2
+    exit 0
+    ;;
+    --check_openresolver)
+    check_openresolver
+    exit 0
+    ;;
+    --check_globalip)
+    check_globalip
     exit 0
     ;;
     *)
