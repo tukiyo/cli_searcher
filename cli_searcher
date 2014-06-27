@@ -2,9 +2,9 @@
 #[config]------------------------------------------------------------------------
 MAC_BROWSER=Safari.app
 #MAC_BROWSER=w3m
-MAC_BROWSER="w3m -dump"
+MAC_BROWSER_CLI="w3m -dump"
 LINUX_BROWSER=x-www-browser
-LINUX_BROWSER="w3m -dump"
+LINUX_BROWSER_CLI="w3m -dump"
 UTF8MANPATH="/usr/local/share/man/ja_JP.UTF-8"
 
 #[functions]------------------------------------------------------------------------
@@ -21,20 +21,24 @@ args_not_found() {
     echo "  --googlemap          : googleマップ"
     echo "  --gmail              : gmail"
     echo "  --google             : google"
-    echo "  --smblookup          : Windowsのコンピュータ名検索"
-    echo "  --whois_jp_contact   : jpドメイン名から登録者一覧を検索"
+    #
     echo "  --jobtalk            : 企業の内情"
     echo "  --kakaku             : 価格コム"
     echo "  --wikipedia          : wikipedia"
+    #
     echo "  --vimdoc             : vimdoc"
     echo "  --weather            : 天気"
     echo "  --youtube            : youtube"
-    echo "  --check_openresolver : DNSサーバがオープンリゾルバ状態か確認"
-    echo "  --check_globalip     : Global IPを確認"
+    #
     echo "  --github-python      : github code search"
     echo "  --github-php         : github code search"
     echo "  --github-html        : github code search"
     echo "  --github-javascript  : github code search"
+    #
+    echo "  --smblookup          : Windowsのコンピュータ名検索"
+    echo "  --whois_jp_contact   : jpドメイン名から登録者一覧を検索"
+    echo "  --check_openresolver : DNSサーバがオープンリゾルバ状態か確認 (keyword不要)"
+    echo "  --check_globalip     : Global IPを確認 (keyword不要)"
     man
 }
 
@@ -103,7 +107,7 @@ check_openresolver() {
 
 check_globalip() {
     COMMAND="curl http://ifconfig.me/"
-    echo "$ $COMMAND"
+    echo "[20秒かかります] $ $COMMAND"
     $COMMAND
 }
 
