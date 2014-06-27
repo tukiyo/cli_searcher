@@ -4,6 +4,7 @@ MAC_BROWSER=Safari.app
 #MAC_BROWSER=w3m
 MAC_BROWSER="w3m -dump"
 LINUX_BROWSER=x-www-browser
+LINUX_BROWSER="w3m -dump"
 UTF8MANPATH="/usr/local/share/man/ja_JP.UTF-8"
 
 #[functions]------------------------------------------------------------------------
@@ -21,7 +22,7 @@ args_not_found() {
     echo "  --gmail              : gmail"
     echo "  --google             : google"
     echo "  --smblookup          : Windowsのコンピュータ名検索"
-    echo "  --whois-jp-contact   : jpドメイン名から登録者一覧を検索"
+    echo "  --whois_jp_contact   : jpドメイン名から登録者一覧を検索"
     echo "  --jobtalk            : 企業の内情"
     echo "  --kakaku             : 価格コム"
     echo "  --wikipedia          : wikipedia"
@@ -105,6 +106,52 @@ whois_jp_contact() {
     browse "http://whois.nic.ad.jp/cgi-bin/whois_gw?key=${WHOIS}&type=CONTACT"
 }
 
+# whois_jp_contact で取得できないパターン用。
+whois_jp_contact2() {
+    DOMAINNAME=${1}
+    DIG_IP=$(dig +short $DOMAINNAME)
+    if [ "$DIG_IP" = "" ];then
+        echo "[quit] $DOMAINNAME のIPアドレスが引けませんでした。"
+        exit 1
+    fi
+    WHOIS="whois -h whois2013.jprs.jp"
+    #
+    IP_RANGE=$(${WHOIS} $DIG_IP | grep "inetnum" | cut -d "]" -f 2)
+    if [ "$IP_RANGE" = "" ];then
+        echo "[info] $DOMAINNAME のIP範囲が引けませんでした。"
+    else
+        echo "[info] IP Range : $IP_RANGE"
+    fi
+    #
+    NAMESERVER=$(${WHOIS} ${DOMAINNAME}/e | grep "Name Server" | head -n 1 | cut -d "]" -f 2)
+    if [ "$NAMESERVER" = "" ];then
+      echo "[quit] $DOMAINNAME の Name Server が引けませんでした。"
+      exit 1
+    fi
+    echo "[info] Name Server : ${NAMESERVER}"
+    #
+    T_CONTACT=$(${WHOIS} ${NAMESERVER}/e | grep "Technical Contact" | cut -d "]" -f 2)
+    if [ "$T_CONTACT" = "" ];then
+      echo "[quit] $DOMAINNAME の Technical Contact が引けませんでした。"
+      exit 1
+    fi
+    echo "[info] Technical Contact : ${T_CONTACT}"
+    #
+    ORGANIZATION=$(${WHOIS} ${T_CONTACT} | nkf -w | grep "組織名" | cut -d "]" -f 2)
+    if [ "$ORGANIZATION" = "" ];then
+      echo "[quit] $DOMAINNAME の 組織名 が引けませんでした。"
+      exit 1
+    fi
+    echo "[info] 組織名 : ${ORGANIZATION}"
+    #
+    whois_jp_browse ${ORGANIZATION}
+}
+
+whois_jp_browse() {
+    url_encode "$(echo $1 | nkf -s)"
+    browse "http://whois.nic.ad.jp/cgi-bin/whois_gw?key=${URL_ENCODED}&type=CONTACT"
+}
+
 #[main]---------------------------------------------------------------------------
 if [ "$1" = "" ];then
     args_not_found
@@ -138,7 +185,11 @@ case "$1" in
     smbutil lookup $2
     exit 0
     ;;
-    --whois-jp-contact)
+    --whois_jp_contact)
+    whois_jp_contact $2
+    exit 0
+    ;;
+    --whois_jp_contact2)
     whois_jp_contact $2
     exit 0
     ;;
