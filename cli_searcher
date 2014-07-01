@@ -37,6 +37,7 @@ args_not_found() {
     #
     echo "  --smblookup          : Windowsのコンピュータ名検索"
     echo "  --whois_jp_contact   : jpドメイン名から登録者一覧を検索"
+    echo "  --whois_jp_contact2  : jpドメイン名から登録者一覧を検索 (上で取得出来ない場合)"
     echo "  --check_openresolver : DNSサーバがオープンリゾルバ状態か確認 (keyword不要)"
     echo "  --check_globalip     : Global IPを確認 (keyword不要)"
     man
@@ -117,8 +118,11 @@ whois_jp_contact() {
         echo "[quit] $1 のIPアドレスが引けませんでした。"
         exit 1
     fi
-    whois $DIG_IP | grep inetnum | tail -n 1
+    COMMAND="whois $DIG_IP | grep inetnum | tail -n 1"
+    echo $COMMAND
+    $COMMAND
     WHOIS=$(whois -h whois2013.jprs.jp $1 | awk -F "]" '/登録者名|組織名/{$1="";print}')
+    echo "[info] $WHOIS"
     url_encode "$(echo $WHOIS | nkf -s)"
     WHOIS=${URL_ENCODED}
     browse "http://whois.nic.ad.jp/cgi-bin/whois_gw?key=${WHOIS}&type=CONTACT"
@@ -134,14 +138,18 @@ whois_jp_contact2() {
     fi
     WHOIS="whois -h whois2013.jprs.jp"
     #
-    IP_RANGE=$(${WHOIS} $DIG_IP | grep "inetnum" | cut -d "]" -f 2)
+    COMMAND="whois $DIG_IP | grep inetnum | cut -d ':' -f 2 | tail -n 1"
+    echo "$ $COMMAND"
+    IP_RANGE=$(whois $DIG_IP | grep inetnum | cut -d ':' -f 2 | tail -n 1)
     if [ "$IP_RANGE" = "" ];then
         echo "[info] $DOMAINNAME のIP範囲が引けませんでした。"
     else
         echo "[info] IP Range : $IP_RANGE"
     fi
     #
-    NAMESERVER=$(${WHOIS} ${DOMAINNAME}/e | grep "Name Server" | head -n 1 | cut -d "]" -f 2)
+    COMMAND="${WHOIS} ${DOMAINNAME}/e | grep 'Name Server' | head -n 1 | cut -d ']' -f 2"
+    echo "$ $COMMAND"
+    NAMESERVER=$($COMMAND)
     if [ "$NAMESERVER" = "" ];then
       echo "[quit] $DOMAINNAME の Name Server が引けませんでした。"
       exit 1
@@ -208,7 +216,7 @@ case "$1" in
     exit 0
     ;;
     --whois_jp_contact2)
-    whois_jp_contact $2
+    whois_jp_contact2 $2
     exit 0
     ;;
     --check_openresolver)
