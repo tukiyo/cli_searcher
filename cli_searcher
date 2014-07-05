@@ -37,6 +37,7 @@ args_not_found() {
     #
     echo "  --smblookup          : Windowsのコンピュータ名検索"
     echo "  --dig_all            : 想像できそうなdig情報一覧"
+    echo "  --dig_color          : digを色付け"
     echo "  --whois_jp_contact   : jpドメイン名から登録者一覧を検索"
     echo "  --whois_jp_contact2  : jpドメイン名から登録者一覧を検索 (上で取得出来ない場合)"
     echo "  --check_openresolver : DNSサーバがオープンリゾルバ状態か確認 (keyword不要)"
@@ -131,6 +132,11 @@ dig_all() {
     if [ "`dig any ${DOMAIN} ${DNS_SERVER} | grep SOA`" = "" ];then
         dig soa ${DOMAIN} ${DNS_SERVER} | grep SOA | grep -v ";"
     fi
+}
+
+dig_color() {
+    shift
+    dig $@ | vim "+set ft=dns" -R -
 }
 
 whois_jp_contact() {
@@ -232,6 +238,10 @@ case "$1" in
     ;;
     --dig_all)
     dig_all $@
+    exit 0
+    ;;
+    --dig_color)
+    dig_color $@
     exit 0
     ;;
     --whois_jp_contact)
