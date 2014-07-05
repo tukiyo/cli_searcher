@@ -137,7 +137,7 @@ dig_all() {
 
 dig_color() {
     shift
-    dig $@ | vim "+set ft=dns" "+set nu" "+map q :q" -R -
+    dig $@ | vim "+set ft=dns" "+set nu" "+map q :q<CR>" -R -
 }
 
 whois_jp_contact() {
