@@ -136,12 +136,10 @@ dig_all() {
 whois_jp_contact() {
     DIG_IP=$(dig +short $1)
     if [ "$DIG_IP" = "" ];then
-        echo "[quit] $1 のIPアドレスが引けませんでした。"
-        exit 1
+        echo "[info] $1 のIPアドレスが引けませんでした。"
+    else
+        whois $DIG_IP | grep inet
     fi
-    COMMAND="whois $DIG_IP | grep inetnum | tail -n 1"
-    echo $COMMAND
-    $COMMAND
     WHOIS=$(whois -h whois2013.jprs.jp $1 | awk -F "]" '/登録者名|組織名/{$1="";print}')
     echo "[info] $WHOIS"
     url_encode "$(echo $WHOIS | nkf -s)"
