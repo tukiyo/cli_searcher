@@ -3,7 +3,8 @@
 MAC_BROWSER=Safari.app
 #MAC_BROWSER=w3m
 MAC_BROWSER_CLI="w3m -dump"
-LINUX_BROWSER=x-www-browser
+#LINUX_BROWSER=x-www-browser
+LINUX_BROWSER="w3m -dump"
 LINUX_BROWSER_CLI="w3m -dump"
 UTF8MANPATH="/usr/local/share/man/ja_JP.UTF-8"
 
@@ -37,7 +38,7 @@ args_not_found() {
     #
     echo "  --smblookup          : Windowsのコンピュータ名検索"
     echo "  --dig_all            : 想像できそうなdig情報一覧"
-    echo "  --dig_color          : digを色付け"
+    echo "  --dig_color          : digを色付け。qを押すと終了"
     echo "  --whois_jp_contact   : jpドメイン名から登録者一覧を検索"
     echo "  --whois_jp_contact2  : jpドメイン名から登録者一覧を検索 (上で取得出来ない場合)"
     echo "  --check_openresolver : DNSサーバがオープンリゾルバ状態か確認 (keyword不要)"
@@ -136,7 +137,7 @@ dig_all() {
 
 dig_color() {
     shift
-    dig $@ | vim "+set ft=dns" -R -
+    dig $@ | vim "+set ft=dns" "+set nu" "+map q :q" -R -
 }
 
 whois_jp_contact() {
